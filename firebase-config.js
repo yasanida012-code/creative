@@ -7,10 +7,10 @@
 //  (데모 모드: 이 브라우저에만 저장되고 다른 사람과 공유되지 않음)
 // ─────────────────────────────────────────────────────────────
 export const firebaseConfig = {
-  apiKey: "",
-  authDomain: "",
-  projectId: "",
-  storageBucket: "",
-  messagingSenderId: "",
-  appId: ""
+  apiKey: "AIzaSyDH5TQy8bDJrdSDQEWR7IqHGy3xsmt3AHk",
+  authDomain: "creative-mathscience.firebaseapp.com",
+  projectId: "creative-mathscience",
+  storageBucket: "creative-mathscience.firebasestorage.app",
+  messagingSenderId: "928404067456",
+  appId: "1:928404067456:web:f3033d67490cc4ff844265"
 };
