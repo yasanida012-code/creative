@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Creative Math&amp;Science — 문제 탐색</title>
+  <meta name="description" content="흥미로운 수학·과학 문제를 발견하고, 답을 맞혀 해설을 열어보세요.">
+  <meta property="og:title" content="Creative Math&amp;Science — Problem Explorer">
+  <meta property="og:description" content="흥미로운 수학·과학 문제를 발견하고, 답을 맞혀 해설을 열어보세요.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2316181D'/%3E%3Cpath d='M9 22V10l7 8 7-8v12' stroke='%23fff' stroke-width='2.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar-in">
+      <a class="brand" href="#/">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" width="30" height="30"><rect width="32" height="32" rx="8" fill="currentColor"/><path d="M9 22V10l7 8 7-8v12" stroke="var(--bg)" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+        <span class="brand-text"><span class="brand-pre">Creative </span><b>Math&amp;Science</b></span>
+      </a>
+      <nav class="mainnav" aria-label="분류">
+        <a href="#/" data-nav="all">모든 문제</a>
+        <a href="#/math" data-nav="math">수학</a>
+        <a href="#/science" data-nav="science">과학</a>
+      </nav>
+      <div class="top-actions">
+        <a class="btn btn-primary btn-sm" href="#/new">
+          <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+          <span>문제 올리기</span>
+        </a>
+        <div id="userSlot"></div>
+      </div>
+    </div>
+  </header>
+
+  <div id="demoBanner" class="demo-banner" hidden>
+    <div class="wrap">데모 모드예요 — 지금 올리는 내용은 이 브라우저에만 저장돼요. <code>firebase-config.js</code>에 Firebase 설정을 넣으면 모두와 공유됩니다.</div>
+  </div>
+
+  <main id="view" class="wrap" tabindex="-1"></main>
+
+  <footer class="foot">
+    <div class="wrap">Creative Math&amp;Science · 문제를 풀고, 나누고, 토론하는 곳</div>
+  </footer>
+
+  <!-- 로그인 -->
+  <dialog id="loginDlg" class="dlg">
+    <form method="dialog" class="dlg-body" id="loginForm">
+      <h2>로그인</h2>
+      <p class="muted">문제를 올리거나 댓글을 쓰려면 로그인이 필요해요.</p>
+      <button type="button" class="btn btn-google" id="googleBtn">
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5a5.6 5.6 0 0 1-2.4 3.6v3h3.9c2.3-2.1 3.5-5.2 3.5-8.8z"/><path fill="#34A853" d="M12 24c3.2 0 6-1.1 8-2.9l-3.9-3c-1.1.7-2.5 1.2-4.1 1.2-3.1 0-5.8-2.1-6.7-5H1.3v3.1A12 12 0 0 0 12 24z"/><path fill="#FBBC05" d="M5.3 14.3a7.2 7.2 0 0 1 0-4.6V6.6h-4a12 12 0 0 0 0 10.8l4-3.1z"/><path fill="#EA4335" d="M12 4.8c1.8 0 3.3.6 4.6 1.8l3.4-3.4A12 12 0 0 0 1.3 6.6l4 3.1c.9-2.9 3.6-4.9 6.7-4.9z"/></svg>
+          Google로 계속하기
+      </button>
+      <div class="or"><span>또는 이메일</span></div>
+      <label class="field"><span>이메일</span><input type="email" id="loginEmail" autocomplete="email"></label>
+      <label class="field"><span>비밀번호 (6자 이상)</span><input type="password" id="loginPw" autocomplete="current-password" minlength="6"></label>
+      <p class="form-err" id="loginErr" role="alert"></p>
+      <div class="dlg-actions">
+        <button type="button" class="btn btn-ghost" id="signupBtn">새로 가입</button>
+        <button type="button" class="btn btn-primary" id="emailLoginBtn">로그인</button>
+      </div>
+      <button type="button" class="dlg-x" aria-label="닫기" data-close>
+        <svg viewBox="0 0 24 24" width="20" height="20"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </form>
+  </dialog>
+
+  <!-- 닉네임 -->
+  <dialog id="nickDlg" class="dlg">
+    <form method="dialog" class="dlg-body" id="nickForm">
+      <h2>닉네임 정하기</h2>
+      <p class="muted">문제와 댓글에 이 이름이 표시돼요. (1~20자)</p>
+      <label class="field"><span>닉네임</span><input id="nickInput" maxlength="20" required></label>
+      <p class="form-err" id="nickErr" role="alert"></p>
+      <div class="dlg-actions"><button class="btn btn-primary" id="nickSave">저장</button></div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+rules_version = '2';
+// Firebase 콘솔 → Firestore Database → 규칙(Rules) 탭에 이 내용을 통째로 붙여넣고 "게시"를 누르세요.
+service cloud.firestore {
+  match /databases/{db}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function isAdmin() { return signedIn() && exists(/databases/$(db)/documents/admins/$(request.auth.uid)); }
+    function onlyChanged(keys) { return request.resource.data.diff(resource.data).affectedKeys().hasOnly(keys); }
+
+    // 관리자 목록 (콘솔에서 직접 문서 추가: admins/{내 uid})
+    match /admins/{uid} {
+      allow read: if signedIn() && request.auth.uid == uid;
+      allow write: if false;
+    }
+
+    // 사용자 닉네임
+    match /users/{uid} {
+      allow read: if true;
+      allow write: if signedIn() && request.auth.uid == uid
+        && request.resource.data.nickname is string
+        && request.resource.data.nickname.size() >= 1
+        && request.resource.data.nickname.size() <= 20;
+
+      // 내가 맞힌 문제 (본인만 읽기/생성, 수정·삭제 불가 → 맞힌 수 부풀리기 방지)
+      match /solved/{pid} {
+        allow read, create: if signedIn() && request.auth.uid == uid;
+      }
+    }
+
+    // 문제 목록 (제목·썸네일 등)
+    match /problems/{pid} {
+      allow read: if true;
+
+      allow create: if signedIn()
+        && request.resource.data.authorUid == request.auth.uid
+        && request.resource.data.title is string
+        && request.resource.data.title.size() > 0
+        && request.resource.data.title.size() <= 100
+        && request.resource.data.category in ['math', 'science']
+        && request.resource.data.solvedCount == 0
+        && request.resource.data.commentCount == 0;
+
+      allow update: if signedIn() && (
+        // 맞힌 수 +1 : 처음 맞힐 때만 (같은 요청에서 solved 기록이 새로 생겨야 함)
+        (onlyChanged(['solvedCount'])
+          && request.resource.data.solvedCount == resource.data.solvedCount + 1
+          && !exists(/databases/$(db)/documents/users/$(request.auth.uid)/solved/$(pid))
+          && existsAfter(/databases/$(db)/documents/users/$(request.auth.uid)/solved/$(pid)))
+        ||
+        // 댓글 수 ±1
+        (onlyChanged(['commentCount'])
+          && (request.resource.data.commentCount == resource.data.commentCount + 1
+              || request.resource.data.commentCount == resource.data.commentCount - 1))
+      );
+
+      allow delete: if signedIn() && (resource.data.authorUid == request.auth.uid || isAdmin());
+
+      // 댓글
+      match /comments/{cid} {
+        allow read: if true;
+        allow create: if signedIn()
+          && request.resource.data.authorUid == request.auth.uid
+          && request.resource.data.text is string
+          && request.resource.data.text.size() > 0
+          && request.resource.data.text.size() <= 2000;
+        allow delete: if signedIn() && (resource.data.authorUid == request.auth.uid || isAdmin());
+      }
+    }
+
+    // 문제 원본 이미지 + 잠긴 해설
+    match /problemData/{pid} {
+      allow read: if true;
+      allow create: if signedIn() && request.resource.data.authorUid == request.auth.uid;
+      allow delete: if signedIn() && (resource.data.authorUid == request.auth.uid || isAdmin());
+    }
+  }
+}
